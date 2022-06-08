@@ -20,26 +20,44 @@ $(document).ready(function () {
       padding: CryptoJS.pad.ZeroPadding
     });
 
-    const encodedMessage = btoa(encryptedMessage);
-
     const Encryptor = new JSEncrypt();
     Encryptor.setPublicKey(publicKey);
-    const doubleEncryptedMessage = Encryptor.encrypt(encodedMessage);
+    const doubleEncryptedMessage = Encryptor.encrypt(encryptedMessage);
+
+    const encodedMessage = btoa(doubleEncryptedMessage);
+
+    $("#login").click(function () {
+      message = encrypt($("form").serialize());
+
+      $.ajax({
+        type: "POST",
+        dataType: "JSON",
+        url: "php/decrypt.php",
+        data: {
+          message: encodedMessage,
+          key: key,
+          iv: iv
+        },
+        success: function (response) {
+          console.log(response);
+        }
+      });
+    });
+  }
+
+  $("#login").click(function () {
+    message = encrypt($("form").serialize());
 
     $.ajax({
       type: "POST",
       dataType: "JSON",
-      url: "../php/decrypt.php",
+      url: "php/decrypt.php",
       data: {
-        message: doubleEncryptedMessage
+        message: message
       },
       success: function (response) {
         console.log(response);
       }
     });
-  }
-
-  $("#login").click(function () {
-    encrypt($("form").serialize());
   });
 });
